@@ -1,7 +1,7 @@
 #include "pch.h"
-#include <gtest/gtest.h>   
-#include "../lab1/TBitset.h"
-#include "../lab1/TSet.h"
+#include <gtest/gtest.h>
+#include "../lab1/tbitfield.h"
+#include "../lab1/tset.h"
 
 TEST(TBitFieldTest, Initialization) {
     TBitField bf(8);
@@ -19,40 +19,78 @@ TEST(TBitFieldTest, SetAndClear) {
     EXPECT_EQ(bf.GetBit(3), 0);
 }
 
-TEST(TSetTest, AddAndRemove) {
-    TSet set(10);
-    set.Add(5);
-    EXPECT_TRUE(set.Contains(5));
-    EXPECT_FALSE(set.Contains(1));
+TEST(TBitFieldTest, LogicOperations) {
+    TBitField a(4);
+    TBitField b(4);
+    a.SetBit(1); a.SetBit(3);
+    b.SetBit(1); b.SetBit(2);
 
-    set.Remove(5);
-    EXPECT_FALSE(set.Contains(5));
+    TBitField orRes = a | b;
+    EXPECT_EQ(orRes.GetBit(1), 1);
+    EXPECT_EQ(orRes.GetBit(2), 1);
+    EXPECT_EQ(orRes.GetBit(3), 1);
+
+    TBitField andRes = a & b;
+    EXPECT_EQ(andRes.GetBit(1), 1);
+    EXPECT_EQ(andRes.GetBit(2), 0);
+}
+
+TEST(TSetTest, InsAndDel) {
+    TSet set(10);
+    set.InsElem(5);
+    EXPECT_TRUE(set.IsMember(5));
+    EXPECT_FALSE(set.IsMember(1));
+
+    set.DelElem(5);
+    EXPECT_FALSE(set.IsMember(5));
 }
 
 TEST(TSetTest, UnionOperation) {
     TSet a(10);
     TSet b(10);
+    a.InsElem(1); a.InsElem(2);
+    b.InsElem(2); b.InsElem(3);
 
-    a.Add(1); a.Add(2);
-    b.Add(2); b.Add(3);
+    TSet result = a + b;
 
-    TSet result = a.Union(b);
-
-    EXPECT_TRUE(result.Contains(1));
-    EXPECT_TRUE(result.Contains(2));
-    EXPECT_TRUE(result.Contains(3));
-    EXPECT_FALSE(result.Contains(4));
+    EXPECT_TRUE(result.IsMember(1));
+    EXPECT_TRUE(result.IsMember(2));
+    EXPECT_TRUE(result.IsMember(3));
+    EXPECT_FALSE(result.IsMember(4));
 }
 
-TEST(TSetTest, EmptyAndFull) {
-    TSet set(5);
+TEST(TSetTest, Intersection) {
+    TSet a(10);
+    TSet b(10);
+    a.InsElem(1); a.InsElem(2); a.InsElem(3);
+    b.InsElem(2); b.InsElem(3); b.InsElem(4);
 
-    EXPECT_TRUE(set.IsEmpty());
-    EXPECT_FALSE(set.IsFull());
+    TSet result = a * b;
 
-    for (int i = 0; i <= 5; i++) {
-        set.Add(i);
-    }
+    EXPECT_FALSE(result.IsMember(1));
+    EXPECT_TRUE(result.IsMember(2));
+    EXPECT_TRUE(result.IsMember(3));
+    EXPECT_FALSE(result.IsMember(4));
+}
 
-    EXPECT_TRUE(set.IsFull());
+TEST(TSetTest, Complement) {
+    TSet set(3);
+    set.InsElem(1);
+
+    TSet comp = ~set;
+
+    EXPECT_TRUE(comp.IsMember(0));
+    EXPECT_FALSE(comp.IsMember(1));
+    EXPECT_TRUE(comp.IsMember(2));
+    EXPECT_TRUE(comp.IsMember(3));
+}
+
+TEST(TSetTest, AddElementViaOperator) {
+    TSet a(5);
+    a.InsElem(1);
+
+    TSet b = a + 3;
+
+    EXPECT_TRUE(b.IsMember(1));
+    EXPECT_TRUE(b.IsMember(3));
 }

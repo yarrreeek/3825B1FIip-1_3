@@ -1,99 +1,108 @@
 #include "pch.h"
-#include "../lab1/TSet.h"
+#include "tset.h"
 #include <iostream>
 #include <stdexcept>
 
-TSet::TSet(int maxPower) : bf(maxPower + 1) {
+TSet::TSet(int mp) : BitField(mp + 1) {
+    MaxPower = mp;
 }
 
-void TSet::Add(int elem) {
-    if (elem < 0 || elem >= bf.GetLength()) {
-        return;
-    }
-    bf.SetBit(elem);
+TSet::TSet(const TSet& s) : BitField(s.BitField) {
+    MaxPower = s.MaxPower;
 }
 
-void TSet::Remove(int elem) {
-    if (elem < 0 || elem >= bf.GetLength()) {
-        return;
-    }
-    bf.ClrBit(elem);
+TSet::TSet(const TBitField& bf) : BitField(bf) {
+    MaxPower = bf.GetLength() - 1;
 }
 
-bool TSet::Contains(int elem) const {
-    if (elem < 0 || elem >= bf.GetLength()) return false;
-    return bf.GetBit(elem) == 1;
+TSet::operator TBitField() {
+    return BitField;
 }
 
-bool TSet::IsEmpty() const {
-    for (int i = 0; i < bf.GetLength(); i++) {
-        if (bf.GetBit(i) == 1) return false;
-    }
-    return true;
+int TSet::GetMaxPower(void) const {
+    return MaxPower;
 }
 
-bool TSet::IsFull() const {
-    for (int i = 0; i < bf.GetLength(); i++) {
-        if (bf.GetBit(i) == 0) return false;
-    }
-    return true;
+void TSet::InsElem(const int Elem) {
+    if (Elem < 0 || Elem > MaxPower) return;
+    BitField.SetBit(Elem);
 }
 
-int TSet::GetMaxPower() const {
-    return bf.GetLength() - 1;
+void TSet::DelElem(const int Elem) {
+    if (Elem < 0 || Elem > MaxPower) return;
+    BitField.ClrBit(Elem);
 }
 
-TSet TSet::Union(const TSet& other) const {
-    if (this->bf.GetLength() != other.bf.GetLength()) {
-        throw std::invalid_argument("Sets must be of the same size");
-    }
-    TSet res(this->GetMaxPower());
-    res.bf = this->bf | other.bf;
+int TSet::IsMember(const int Elem) const {
+    if (Elem < 0 || Elem > MaxPower) return 0;
+    return BitField.GetBit(Elem);
+}
+
+int TSet::operator==(const TSet& s) const {
+    return (MaxPower == s.MaxPower) && (BitField == s.BitField);
+}
+
+int TSet::operator!=(const TSet& s) const {
+    return !(*this == s);
+}
+
+TSet& TSet::operator=(const TSet& s) {
+    if (this == &s) return *this;
+    MaxPower = s.MaxPower;
+    BitField = s.BitField;
+    return *this;
+}
+
+TSet TSet::operator+(const int Elem) {
+    TSet res(*this);
+    res.InsElem(Elem);
     return res;
 }
 
-TSet TSet::Intersection(const TSet& other) const {
-    if (this->bf.GetLength() != other.bf.GetLength()) {
-        throw std::invalid_argument("Sets must be of the same size");
-    }
-    TSet res(this->GetMaxPower());
-    res.bf = this->bf & other.bf;
+TSet TSet::operator-(const int Elem) {
+    TSet res(*this);
+    res.DelElem(Elem);
     return res;
 }
 
-TSet TSet::Difference(const TSet& other) const {
-    if (this->bf.GetLength() != other.bf.GetLength()) {
-        throw std::invalid_argument("Sets must be of the same size");
-    }
-    TSet res(this->GetMaxPower());
-    res.bf = this->bf & (~other.bf);
+TSet TSet::operator+(const TSet& s) {
+    if (MaxPower != s.MaxPower) throw std::invalid_argument("Sizes must match");
+    TSet res(MaxPower);
+    res.BitField = BitField | s.BitField;
     return res;
 }
 
-TSet TSet::Complement() const {
-    TSet res(this->GetMaxPower());
-    res.bf = ~this->bf;
+TSet TSet::operator*(const TSet& s) {
+    if (MaxPower != s.MaxPower) throw std::invalid_argument("Sizes must match");
+    TSet res(MaxPower);
+    res.BitField = BitField & s.BitField;
     return res;
 }
 
-bool TSet::operator==(const TSet& other) const {
-    return this->bf == other.bf;
+TSet TSet::operator~(void) {
+    TSet res(MaxPower);
+    res.BitField = ~BitField;
+    return res;
 }
 
-bool TSet::operator!=(const TSet& other) const {
-    return !(*this == other);
-}
-
-std::ostream& operator<<(std::ostream& os, const TSet& set) {
-    os << "{ ";
+std::ostream& operator<<(std::ostream& ostr, const TSet& set) {
+    ostr << "{ ";
     bool first = true;
-    for (int i = 0; i < set.bf.GetLength(); i++) {
-        if (set.bf.GetBit(i) == 1) {
-            if (!first) os << ", ";
-            os << i;
+    for (int i = 0; i <= set.MaxPower; i++) {
+        if (set.BitField.GetBit(i) == 1) {
+            if (!first) ostr << ", ";
+            ostr << i;
             first = false;
         }
     }
-    os << " }";
-    return os;
+    ostr << " }";
+    return ostr;
+}
+
+std::istream& operator>>(std::istream& istr, TSet& set) {
+    int x;
+    while (istr >> x && x != -1) {
+        set.InsElem(x);
+    }
+    return istr;
 }

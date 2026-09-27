@@ -1,29 +1,30 @@
 #pragma once
-#include "TBitset.h"
 
-class TSet {
+#include "tbitfield.h"
+
+class TSet
+{
 private:
-    TBitField bf;
-
+	int MaxPower;
+	TBitField BitField;
 public:
+	TSet(int mp);
+	TSet(const TSet& s);
+	TSet(const TBitField& bf);
+	operator TBitField();
+	int GetMaxPower(void) const;
+	void InsElem(const int Elem);
+	void DelElem(const int Elem);
+	int IsMember(const int Elem) const;
+	int operator== (const TSet& s) const;
+	int operator!= (const TSet& s) const;
+	TSet& operator=(const TSet& s);
+	TSet operator+ (const int Elem);
+	TSet operator- (const int Elem);
+	TSet operator+ (const TSet& s);
+	TSet operator* (const TSet& s);
+	TSet operator~ (void);
 
-    TSet(int maxPower);
-
-    void Add(int elem);         
-    void Remove(int elem);      
-    bool IsFull() const;        
-    bool IsEmpty() const;     
-    bool Contains(int elem) const; 
-    int GetMaxPower() const;
-
-    TSet Union(const TSet& other) const;        
-    TSet Intersection(const TSet& other) const; 
-    TSet Difference(const TSet& other) const;  
-    TSet Complement() const;                   
-
-    bool operator==(const TSet& other) const;
-    bool operator!=(const TSet& other) const;
-
-
-    friend std::ostream& operator<<(std::ostream& os, const TSet& set);
+	friend std::istream& operator>>(std::istream& istr, TSet& bf);
+	friend std::ostream& operator<<(std::ostream& ostr, const TSet& bf);
 };

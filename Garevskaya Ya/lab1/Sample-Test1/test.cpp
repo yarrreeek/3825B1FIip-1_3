@@ -1,7 +1,6 @@
-#include "pch.h"
 #include <gtest/gtest.h>
-#include "../lab1/tbitfield.h"
-#include "../lab1/tset.h"
+#include "../../includes/Lab1/tbitfield.h"
+#include "../../includes/Lab1/tset.h"
 
 TEST(TBitFieldTest, Initialization) {
     TBitField bf(8);

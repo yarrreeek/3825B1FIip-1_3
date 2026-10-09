@@ -1,5 +1,5 @@
-﻿#include "pch.h"
-#include "tbitfield.h"
+﻿#include "../../includes/Lab1/tbitfield.h"
+#include "../../includes/Lab1/tset.h"
 #include <stdexcept>
 #include <string>
 

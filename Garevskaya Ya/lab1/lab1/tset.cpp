@@ -1,5 +1,4 @@
-#include "pch.h"
-#include "tset.h"
+#include "../../includes/Lab1/tset.h"
 #include <iostream>
 #include <stdexcept>
 
